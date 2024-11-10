@@ -12,5 +12,5 @@
 !/riddles/migrations/__init__.py
 
 /zones/migrations/*
-!//zones/migrations/__init__.py
+!/zones/migrations/__init__.py
 
