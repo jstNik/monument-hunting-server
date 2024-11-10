@@ -1,0 +1,16 @@
+../.idea
+
+/monument_hunting/.env
+
+/accounts/migrations/*
+!/accounts/migrations/__init__.py
+
+/monuments/migrations/*
+!/monuments/migrations/__init__.py
+
+/riddles/migrations/*
+!/riddles/migrations/__init__.py
+
+/zones/migrations/*
+!//zones/migrations/__init__.py
+
