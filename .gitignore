@@ -1,6 +1,7 @@
 .idea
 
 staticfiles
+static
 
 /monument_hunting/.env
 
