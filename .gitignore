@@ -1,5 +1,7 @@
 .idea
 
+staticfiles
+
 /monument_hunting/.env
 
 /accounts/migrations/*
