@@ -27,7 +27,7 @@ environ.Env.read_env()
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # TODO Set debug to False
+DEBUG = True  # TODO Set debug to False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -40,10 +40,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "players",
     "zones",
     "monuments",
-    "riddles"
+    "riddles",
+    "players_riddles"
 ]
+
+AUTH_USER_MODEL = "players.Player"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
