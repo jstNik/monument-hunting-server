@@ -1,11 +1,11 @@
 .idea
-
 staticfiles
+db.json
 
 /monument_hunting/.env
 
-/accounts/migrations/*
-!/accounts/migrations/__init__.py
+/players/migrations/*
+!/players/migrations/__init__.py
 
 /monuments/migrations/*
 !/monuments/migrations/__init__.py
