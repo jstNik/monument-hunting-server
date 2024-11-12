@@ -7,6 +7,9 @@ db.json
 /players/migrations/*
 !/players/migrations/__init__.py
 
+/players_riddles/migrations/*
+!/players_riddles/migrations/__init__.py
+
 /monuments/migrations/*
 !/monuments/migrations/__init__.py
 
