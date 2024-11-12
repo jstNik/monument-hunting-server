@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db.models import *
 import json
 from django.forms import model_to_dict
@@ -8,9 +8,9 @@ from django.forms import model_to_dict
 class Zone(Model):
     name = CharField(max_length=100)
     coordinates = TextField()
-    color = IntegerField(
-        default=0,
-        validators=[MaxValueValidator(0xFFFFFF), MinValueValidator(0x000000)]
+    color = CharField(
+        max_length=8,
+        validators=[RegexValidator("#[0-9a-fA-F]{6}")]
     )
 
     def transform_coords(self):
