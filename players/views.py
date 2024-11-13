@@ -1,5 +1,6 @@
 import re
 
+import jwt
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
@@ -26,14 +27,18 @@ class LoginView(APIView):
             )
         username = request.data["username"]
         password = request.data["password"]
-        user = authenticate(
+        player = authenticate(
             username=username, password=password)
-        if user is not None:
-            refresh = RefreshToken.for_user(user)
+        if player is not None:
+            refresh = RefreshToken.for_user(player)
+            decode_access = jwt.decode(str(refresh.access_token), options={"verify_signature": False})
+            decode_refresh = jwt.decode(str(refresh), options={"verify_signature": False})
             return Response(
                 {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token)
+                    "access_token": str(refresh.access_token),
+                    "access_expiration": decode_access.get("exp"),
+                    "refresh_token": str(refresh),
+                    "refresh_expiration": decode_refresh.get("exp")
                 },
                 status=status.HTTP_200_OK
             )
@@ -90,13 +95,17 @@ class SignupView(APIView):
                 password=make_password(password),
                 email=email
             )
-            token = RefreshToken.for_user(player)
+            refresh = RefreshToken.for_user(player)
+            decode_access = jwt.decode(str(refresh.access_token), options={"verify_signature": False})
+            decode_refresh = jwt.decode(str(refresh), options={"verify_signature": False})
             return Response(
                 {
-                    "refresh": str(token),
-                    "access": str(token.access_token)
+                    "access_token": str(refresh.access_token),
+                    "access_expiration": decode_access.get("exp"),
+                    "refresh_token": str(refresh),
+                    "refresh_expiration": decode_refresh.get("exp")
                 },
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_200_OK
             )
         except Exception as e:
             Response(
