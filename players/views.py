@@ -2,6 +2,7 @@ import re
 
 import jwt
 from django.contrib.auth.hashers import make_password
+from django.contrib.gis.gdal.prototypes.srs import get_auth_code
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from gunicorn.config import validate_user
@@ -12,6 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
 from django.core.validators import validate_email
 
+from common.utils import extract_api_key, client_not_authorized, invalid_credentials
 from monument_hunting.settings import env, SECRET_KEY
 from .models import Player
 
@@ -19,47 +21,24 @@ from .models import Player
 class LoginView(APIView):
 
     def post(self, request, *args, **kwargs):
-        api_key = request.headers.get("API-KEY")
+        api_key = extract_api_key(request)
         if api_key != env("API_KEY"):
-            return Response(
-                {"error": "Your client is not authorized"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        username = request.data["username"]
-        password = request.data["password"]
-        player = authenticate(
-            username=username, password=password
-        )
+            return client_not_authorized()
+        username = request.data.get("username")
+        password = request.data.get("password")
+        player = authenticate(username=username, password=password)
         if player is not None:
-            refresh: RefreshToken = RefreshToken.for_user(player)
-            decode_access = jwt.decode(str(refresh.access_token), SECRET_KEY, algorithms=["HS256"])
-            decode_refresh = jwt.decode(str(refresh), SECRET_KEY, algorithms=["HS256"])
-            return Response(
-                {
-                    "access_token": str(refresh.access_token),
-                    "access_expiration": decode_access.get("exp"),
-                    "refresh_token": str(refresh),
-                    "refresh_expiration": decode_refresh.get("exp")
-                },
-                status=status.HTTP_200_OK
-            )
+            return get_auth_code(player)
         else:
-            return Response(
-                {"error": "Invalid credentials"},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class SignupView(APIView):
 
     def post(self, request):
-        api_key = request.headers.get("API-KEY")
+        api_key = extract_api_key(request)
         if api_key != env("API_KEY"):
-            return Response(
-                {"error": "Your client is not authorized"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
+            return client_not_authorized()
         username = request.data["username"]
         password = request.data["password"]
         email = request.data["email"]
