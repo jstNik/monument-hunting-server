@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.utils import extract_api_key, client_not_authorized, invalid_id
+from common.utils import invalid_id, extract_api_key, client_not_authorized
 from monument_hunting.settings import env
 from .models import PlayersRiddles
 
@@ -19,7 +19,7 @@ class PlayersRiddlesView(APIView):
             return client_not_authorized()
         player_pk = self.kwargs.get("pk")
         if player_pk is None:
-            invalid_id()
+            return invalid_id()
         riddles = PlayersRiddles.objects.select_related("riddle").filter(player__id=player_pk)
         riddles = [pr.serialize() for pr in riddles]
         return Response(riddles, status=status.HTTP_200_OK)

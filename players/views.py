@@ -2,7 +2,6 @@ import re
 
 import jwt
 from django.contrib.auth.hashers import make_password
-from django.contrib.gis.gdal.prototypes.srs import get_auth_code
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from gunicorn.config import validate_user
@@ -13,9 +12,10 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
 from django.core.validators import validate_email
 
-from common.utils import extract_api_key, client_not_authorized, invalid_credentials
+from common.utils import client_not_authorized, extract_api_key
 from monument_hunting.settings import env, SECRET_KEY
 from .models import Player
+from .utils import generate_auth_token
 
 
 class LoginView(APIView):
@@ -26,11 +26,17 @@ class LoginView(APIView):
             return client_not_authorized()
         username = request.data.get("username")
         password = request.data.get("password")
-        player = authenticate(username=username, password=password)
+        player = authenticate(
+            username=username, password=password
+        )
         if player is not None:
-            return get_auth_code(player)
+            refresh: RefreshToken = RefreshToken.for_user(player)
+            return generate_auth_token(refresh)
         else:
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "Invalid credentials"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 class SignupView(APIView):
@@ -39,9 +45,9 @@ class SignupView(APIView):
         api_key = extract_api_key(request)
         if api_key != env("API_KEY"):
             return client_not_authorized()
-        username = request.data["username"]
-        password = request.data["password"]
-        email = request.data["email"]
+        username = request.data.get("username")
+        password = request.data.get("password")
+        email = request.data.get("email")
 
         if username is None or password is None or email is None:
             return Response(
@@ -75,18 +81,8 @@ class SignupView(APIView):
                 password=make_password(password),
                 email=email
             )
-            refresh = RefreshToken.for_user(player)
-            decode_access = jwt.decode(str(refresh.access_token), SECRET_KEY, algorithms=["HS256"])
-            decode_refresh = jwt.decode(str(refresh), SECRET_KEY, algorithms=["HS256"])
-            return Response(
-                {
-                    "access_token": str(refresh.access_token),
-                    "access_expiration": decode_access.get("exp"),
-                    "refresh_token": str(refresh),
-                    "refresh_expiration": decode_refresh.get("exp")
-                },
-                status=status.HTTP_200_OK
-            )
+            refresh: RefreshToken = RefreshToken.for_user(player)
+            return generate_auth_token(refresh)
         except Exception as e:
             Response(
                 {"error": str(e)},
@@ -97,21 +93,14 @@ class SignupView(APIView):
 class TokenRefreshView(APIView):
 
     def post(self, request):
+        api_key = extract_api_key(request)
+        if api_key != env("API_KEY"):
+            return client_not_authorized()
         refresh_token = request.data.get("refresh_token")
         if refresh_token:
             try:
                 refresh = RefreshToken(refresh_token)
-                decode_access = jwt.decode(str(refresh.access_token), SECRET_KEY, algorithms=["HS256"])
-                decode_refresh = jwt.decode(str(refresh), SECRET_KEY, algorithms=["HS256"])
-                return Response(
-                    {
-                        "access_token": str(refresh.access_token),
-                        "access_expiration": decode_access.get("exp"),
-                        "refresh_token": str(refresh),
-                        "refresh_expiration": decode_refresh.get("exp")
-                    },
-                    status=status.HTTP_200_OK
-                )
+                return generate_auth_token(refresh)
             except Exception as e:
                 return Response(
                     {"error": str(e)},

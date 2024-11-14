@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.utils import extract_api_key, client_not_authorized, invalid_id
+from common.utils import extract_api_key, client_not_authorized
 from monument_hunting.settings import env
 from .models import Zone
 
@@ -31,7 +31,6 @@ class ZonePKView(APIView):
         if api_key != env("API_KEY"):
             return client_not_authorized()
         zone_pk = self.kwargs.get("pk")
-        if zone_pk is None:
-            return invalid_id()
-        zone = Zone.objects.get(zone_pk)
-        return Response(zone.serialize(), status=status.HTTP_200_OK)
+        zone = Zone.objects.get(pk=zone_pk)
+        zone = zone.serialize()
+        return Response(zone, status=status.HTTP_200_OK )
