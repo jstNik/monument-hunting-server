@@ -1,6 +1,8 @@
 .idea
 staticfiles
 db.json
+curl.sh
+response.html
 
 /monument_hunting/.env
 
