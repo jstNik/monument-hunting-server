@@ -12,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
 from django.core.validators import validate_email
 
-from monument_hunting.settings import env
+from monument_hunting.settings import env, SECRET_KEY
 from .models import Player
 
 
@@ -31,8 +31,8 @@ class LoginView(APIView):
             username=username, password=password)
         if player is not None:
             refresh = RefreshToken.for_user(player)
-            decode_access = jwt.decode(str(refresh.access_token), options={"verify_signature": False})
-            decode_refresh = jwt.decode(str(refresh), options={"verify_signature": False})
+            decode_access = jwt.decode(str(refresh.access_token), SECRET_KEY, algorithms=["HS256"])
+            decode_refresh = jwt.decode(str(refresh), SECRET_KEY, algorithms=["HS256"])
             return Response(
                 {
                     "access_token": str(refresh.access_token),
@@ -96,8 +96,8 @@ class SignupView(APIView):
                 email=email
             )
             refresh = RefreshToken.for_user(player)
-            decode_access = jwt.decode(str(refresh.access_token), options={"verify_signature": False})
-            decode_refresh = jwt.decode(str(refresh), options={"verify_signature": False})
+            decode_access = jwt.decode(str(refresh.access_token), SECRET_KEY, algorithms=["HS256"])
+            decode_refresh = jwt.decode(str(refresh), SECRET_KEY, algorithms=["HS256"])
             return Response(
                 {
                     "access_token": str(refresh.access_token),
