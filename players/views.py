@@ -28,9 +28,10 @@ class LoginView(APIView):
         username = request.data["username"]
         password = request.data["password"]
         player = authenticate(
-            username=username, password=password)
+            username=username, password=password
+        )
         if player is not None:
-            refresh = RefreshToken.for_user(player)
+            refresh: RefreshToken = RefreshToken.for_user(player)
             decode_access = jwt.decode(str(refresh.access_token), SECRET_KEY, algorithms=["HS256"])
             decode_refresh = jwt.decode(str(refresh), SECRET_KEY, algorithms=["HS256"])
             return Response(
@@ -112,3 +113,32 @@ class SignupView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class TokenRefreshView(APIView):
+
+    def post(self, request):
+        refresh_token = request.data.get("refresh_token")
+        if refresh_token:
+            try:
+                refresh = RefreshToken(refresh_token)
+                decode_access = jwt.decode(str(refresh.access_token), SECRET_KEY, algorithms=["HS256"])
+                decode_refresh = jwt.decode(str(refresh), SECRET_KEY, algorithms=["HS256"])
+                return Response(
+                    {
+                        "access_token": str(refresh.access_token),
+                        "access_expiration": decode_access.get("exp"),
+                        "refresh_token": str(refresh),
+                        "refresh_expiration": decode_refresh.get("exp")
+                    },
+                    status=status.HTTP_200_OK
+                )
+            except Exception as e:
+                return Response(
+                    {"error": str(e)},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        return Response(
+            {"error": "Refresh token is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
