@@ -8,7 +8,7 @@ def extract_api_key(request):
 
 
 def client_not_authorized():
-    return Response({"error": "Your client is not authorized"}, status=status.HTTP_403_FORBIDDEN)
+    return Response({"error": "Your client is not authorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 def invalid_id():

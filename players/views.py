@@ -110,3 +110,22 @@ class TokenRefreshView(APIView):
             {"error": "Refresh token is required"},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class TokenVerifyView(APIView):
+
+    def post(self, request):
+        api_key = extract_api_key(request)
+        if api_key != env("API_KEY"):
+            return client_not_authorized()
+        token = request.data.get("access_token")
+        if token is None:
+            return client_not_authorized()
+
+        try:
+            verify = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            if "error" in verify:
+                return client_not_authorized()
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return client_not_authorized()
