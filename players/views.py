@@ -61,13 +61,19 @@ class SignupView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        if len(username) < 3 and re.compile(r"\W").match(username):
+            return Response(
+                {"error": "Username can only contain letters, numbers and _"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if Player.objects.filter(username=username).exists():
             return Response(
                 {"error": "Username already exists"},
                 status=status.HTTP_409_CONFLICT
             )
 
-        if len(password) < 8 or not re.compile(r"\w").match(password) or re.compile(r"\s").match(password):
+        if len(password) < 8 or re.compile(r"\W").match(password) or re.compile(r"\s").match(password):
             return Response(
                 {"error": "Password is too weak"},
                 status=status.HTTP_400_BAD_REQUEST
