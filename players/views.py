@@ -61,7 +61,7 @@ class SignupView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if len(username) < 3 and re.compile(r"\W").match(username):
+        if len(username) < 3 or re.compile(r"\W").match(username):
             return Response(
                 {"error": "Username can only contain letters, numbers and _"},
                 status=status.HTTP_400_BAD_REQUEST
