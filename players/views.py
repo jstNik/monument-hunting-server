@@ -46,8 +46,14 @@ class SignupView(APIView):
         if api_key != env("API_KEY"):
             return client_not_authorized()
         username = request.data.get("username")
+        if username == "":
+            username = None
         password = request.data.get("password")
+        if password == "":
+            password = None
         email = request.data.get("email")
+        if email == "":
+            email = None
 
         if username is None or password is None or email is None:
             return Response(
