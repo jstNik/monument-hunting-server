@@ -17,17 +17,14 @@ class PlayersRiddlesView(APIView):
         player_pk = self.kwargs.get("pk")
         if player_pk is None:
             return invalid_id()
-        player_riddles = PlayersRiddles.objects.prefetch_related("riddle")
+        player_riddles = PlayersRiddles.objects.prefetch_related("riddle").filter(player_id=player_pk)
         riddles = Riddle.objects.all()
-
         if not player_riddles:
             return Response([], status=status.HTTP_200_OK)
-        q = player_riddles.query
         player_riddles = [pr.serialize() for pr in player_riddles]
         riddles = [r.serialize() for r in riddles]
         return Response(
             {
-                "q": str(q),
                 "player_riddles": player_riddles,
                 "riddles": riddles
             },
