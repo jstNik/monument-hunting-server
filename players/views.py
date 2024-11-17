@@ -29,9 +29,13 @@ class LoginView(APIView):
         player = authenticate(
             username=username, password=password
         )
-        if player is not None:
+        if player is not None and type(player) is Player:
             refresh: RefreshToken = RefreshToken.for_user(player)
-            return generate_auth_token(refresh)
+            res = {
+                "player": player.serialize(),
+                "auth_token": generate_auth_token(refresh)
+            }
+            return Response(res, status=status.HTTP_200_OK)
         else:
             return Response(
                 {"error": "Invalid credentials"},
@@ -61,7 +65,13 @@ class SignupView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if len(username) < 3 or re.compile(r"\W").match(username):
+        if len(username) < 3:
+            return Response(
+                {"error": "Username must be 3 o more characters long"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if re.compile(r"\W").match(username):
             return Response(
                 {"error": "Username can only contain letters, numbers and _"},
                 status=status.HTTP_400_BAD_REQUEST
@@ -94,7 +104,12 @@ class SignupView(APIView):
                 email=email
             )
             refresh: RefreshToken = RefreshToken.for_user(player)
-            return generate_auth_token(refresh)
+            refresh["player_id"] = player.id
+            res = {
+                "player": player.serialize(),
+                "auth_token": generate_auth_token(refresh)
+            }
+            return Response(res, status=status.HTTP_200_OK)
         except Exception as e:
             Response(
                 {"error": str(e)},
@@ -112,7 +127,10 @@ class TokenRefreshView(APIView):
         if refresh_token:
             try:
                 refresh = RefreshToken(refresh_token)
-                return generate_auth_token(refresh)
+                return Response(
+                    generate_auth_token(refresh),
+                    status=status.HTTP_200_OK
+                )
             except Exception as e:
                 return Response(
                     {"error": str(e)},
@@ -138,6 +156,15 @@ class TokenVerifyView(APIView):
             verify = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             if "error" in verify:
                 return client_not_authorized()
-            return Response(status=status.HTTP_200_OK)
+            player_id = verify.get("player_id")
+            if player_id is None:
+                return client_not_authorized()
+            player = Player.objects.get(id=player_id)
+            if player is None:
+                return client_not_authorized()
+            return Response(
+                player.serialize(),
+                status=status.HTTP_200_OK
+            )
         except Exception as e:
             return client_not_authorized()

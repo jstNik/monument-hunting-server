@@ -1,7 +1,8 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from common.utils import invalid_id
+from common.utils import invalid_id, extract_api_key, client_not_authorized
+from monument_hunting.settings import env
 from players.models import Player
 from riddles.models import Riddle
 from zones.models import Zone
@@ -13,9 +14,9 @@ class PlayersRiddlesView(APIView):
     # permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        # api_key = extract_api_key(request)
-        # if api_key != env("API_KEY"):
-        #     return client_not_authorized()
+        api_key = extract_api_key(request)
+        if api_key != env("API_KEY"):
+            return client_not_authorized()
         player_pk = self.kwargs.get("pk")
         if player_pk is None:
             return invalid_id()
