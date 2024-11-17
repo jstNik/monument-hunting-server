@@ -1,4 +1,5 @@
 .idea
+.venv
 staticfiles
 db.json
 curl.sh
