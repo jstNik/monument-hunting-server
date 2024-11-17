@@ -18,14 +18,11 @@ class PlayersRiddles(Model):
 
     def serialize(self):
         d = model_to_dict(self)
-        d["player"] = self.player.serialize()
+        d["player"] = self.player_id
         d["riddle"] = self.riddle.serialize()
-        p_id = d["player"]["id"]
-        d["player"].clear()
-        d["player"]["id"] = p_id
-        z_id = d["riddle"]["monument"]["zone"]["id"]
-        d["riddle"]["monument"]["zone"].clear()
-        d["riddle"]["monument"]["zone"]["id"] = z_id
+        # z_id = d["riddle"]["zone"]
+        # d["riddle"]["monument"]["zone"].clear()
+        # d["riddle"]["monument"]["zone"] = z_id
         return d
 
     def __str__(self):

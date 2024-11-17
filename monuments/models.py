@@ -9,11 +9,11 @@ class Monument(Model):
     name = CharField(max_length=50, null=False, blank=False)
     latitude = FloatField(null=False)
     longitude = FloatField(null=False)
-    zone = ForeignKey("zones.Zone", on_delete=SET_NULL, null=True)
+    zone = ForeignKey(Zone, on_delete=SET_NULL, null=True)
 
     def serialize(self):
         d = model_to_dict(self)
-        d["zone"] = self.zone.serialize()
+        d["zone"] = self.zone_id
         return d
 
     def __str__(self):
