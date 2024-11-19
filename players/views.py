@@ -108,7 +108,6 @@ class SignupView(APIView):
                 email=email
             )
             refresh: RefreshToken = RefreshToken.for_user(player)
-            refresh["player_id"] = player.id
             res = {
                 "auth_token": generate_auth_token(refresh),
                 "player": player.serialize()
@@ -133,7 +132,7 @@ class TokenRefreshView(APIView):
         if refresh_token:
             try:
                 refresh = RefreshToken(refresh_token)
-                player_id = refresh.get("player_id")
+                player_id = refresh.get("user_id")
                 if player_id is None:
                     return Response(
                         {"error": "Could not retrieve player id"},
@@ -148,7 +147,7 @@ class TokenRefreshView(APIView):
                 return Response(
                     {
                         "auth_token": generate_auth_token(refresh),
-                        "player": player
+                        "player": player.serialize()
                     },
                     status=status.HTTP_200_OK
                 )
@@ -176,11 +175,8 @@ class TokenVerifyView(APIView):
             return client_not_authorized("Token has not been provided.")
 
         try:
-            token = AccessToken(token)
-            verify = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            if "error" in verify:
-                return client_not_authorized("Found an error while decoding the token")
-            player_id = verify.get("player_id")
+            verify = AccessToken(token)
+            player_id = verify.get("user_id")
             if player_id is None:
                 return client_not_authorized("Could not find an id inside the token")
             player = Player.objects.get(id=player_id)
