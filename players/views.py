@@ -110,8 +110,8 @@ class SignupView(APIView):
             refresh: RefreshToken = RefreshToken.for_user(player)
             refresh["player_id"] = player.id
             res = {
-                "player": player.serialize(),
-                "auth_token": generate_auth_token(refresh)
+                "auth_token": generate_auth_token(refresh),
+                "player": player.serialize()
             }
             return Response(res, status=status.HTTP_200_OK)
         except Exception as e:
@@ -133,8 +133,23 @@ class TokenRefreshView(APIView):
         if refresh_token:
             try:
                 refresh = RefreshToken(refresh_token)
+                player_id = refresh.get("player_id")
+                if player_id is None:
+                    return Response(
+                        {"error": "Could not retrieve player id"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                player = Player.objects.get(id=player_id)
+                if player is None:
+                    return Response(
+                        {"error": "Player id is not valid"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
                 return Response(
-                    generate_auth_token(refresh),
+                    {
+                        "auth_token": generate_auth_token(refresh),
+                        "player": player
+                    },
                     status=status.HTTP_200_OK
                 )
             except Exception as e:
