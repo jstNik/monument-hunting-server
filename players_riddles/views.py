@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from common.utils import invalid_id, extract_api_key, client_not_authorized
@@ -11,7 +12,7 @@ from .models import PlayersRiddles
 
 class PlayersRiddlesView(APIView):
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         api_key = extract_api_key(request)

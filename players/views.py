@@ -20,6 +20,8 @@ from .utils import generate_auth_token
 
 class LoginView(APIView):
 
+    permission_classes = []
+
     def post(self, request, *args, **kwargs):
         api_key = extract_api_key(request)
         if api_key != env("API_KEY"):
@@ -44,6 +46,8 @@ class LoginView(APIView):
 
 
 class SignupView(APIView):
+
+    permission_classes = []
 
     def post(self, request):
         api_key = extract_api_key(request)
@@ -119,6 +123,8 @@ class SignupView(APIView):
 
 class TokenRefreshView(APIView):
 
+    permission_classes = []
+
     def post(self, request):
         api_key = extract_api_key(request)
         if api_key != env("API_KEY"):
@@ -144,6 +150,8 @@ class TokenRefreshView(APIView):
 
 class TokenVerifyView(APIView):
 
+    permission_classes = []
+
     def post(self, request):
         api_key = extract_api_key(request)
         if api_key != env("API_KEY"):
@@ -157,7 +165,7 @@ class TokenVerifyView(APIView):
             verify = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             if "error" in verify:
                 return client_not_authorized("Found an error while decoding the token")
-            player_id = verify.get("player_id")
+            player_id = token.get("player_id")
             if player_id is None:
                 return client_not_authorized("Could not find an id inside the token")
             player = Player.objects.get(id=player_id)
