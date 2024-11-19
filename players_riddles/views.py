@@ -29,7 +29,7 @@ class PlayersRiddlesView(APIView):
             riddles = Riddle.objects.all().filter(zone_id=player.zone_id)
         zones = Zone.objects.all()
         if not player_riddles:
-            return Response([], status=status.HTTP_200_OK)
+            player_riddles = [ ]
         player_riddles = [pr.serialize() for pr in player_riddles]
         riddles = [r.serialize() for r in riddles]
         zones = [z.serialize() for z in zones]
