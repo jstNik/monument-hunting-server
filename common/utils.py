@@ -7,8 +7,11 @@ def extract_api_key(request):
     return api_key
 
 
-def client_not_authorized():
-    return Response({"error": "Your client is not authorized"}, status=status.HTTP_401_UNAUTHORIZED)
+def client_not_authorized(message: str = None):
+    return Response(
+        {"error": message if message is not None else "Your client is not authorized"},
+        status=status.HTTP_401_UNAUTHORIZED
+    )
 
 
 def invalid_id():

@@ -147,21 +147,21 @@ class TokenVerifyView(APIView):
     def post(self, request):
         api_key = extract_api_key(request)
         if api_key != env("API_KEY"):
-            return client_not_authorized()
+            return client_not_authorized("Api key not valid")
         token = request.data.get("access_token")
         if token is None:
-            return client_not_authorized()
+            return client_not_authorized("Token has not been provided.")
 
         try:
             verify = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             if "error" in verify:
-                return client_not_authorized()
+                return client_not_authorized("Found an error while decoding the token")
             player_id = verify.get("player_id")
             if player_id is None:
-                return client_not_authorized()
+                return client_not_authorized("Could not find an id inside the token")
             player = Player.objects.get(id=player_id)
             if player is None:
-                return client_not_authorized()
+                return client_not_authorized("Decoded id is not valid")
             return Response(
                 player.serialize(),
                 status=status.HTTP_200_OK
