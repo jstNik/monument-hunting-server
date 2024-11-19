@@ -175,5 +175,5 @@ class TokenVerifyView(APIView):
                 player.serialize(),
                 status=status.HTTP_200_OK
             )
-        except Exception as e:
-            return client_not_authorized()
+        except Exception as _:
+            return client_not_authorized("An error has occured")
