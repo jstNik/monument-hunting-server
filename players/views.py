@@ -153,6 +153,7 @@ class TokenVerifyView(APIView):
             return client_not_authorized("Token has not been provided.")
 
         try:
+            token = AccessToken(token)
             verify = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             if "error" in verify:
                 return client_not_authorized("Found an error while decoding the token")
