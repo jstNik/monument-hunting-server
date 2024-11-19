@@ -176,4 +176,4 @@ class TokenVerifyView(APIView):
                 status=status.HTTP_200_OK
             )
         except Exception as _:
-            return client_not_authorized("An error has occured")
+            return client_not_authorized("An error has occurred")
