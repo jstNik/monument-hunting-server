@@ -165,7 +165,7 @@ class TokenVerifyView(APIView):
             verify = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             if "error" in verify:
                 return client_not_authorized("Found an error while decoding the token")
-            player_id = token.get("player_id")
+            player_id = verify.get("player_id")
             if player_id is None:
                 return client_not_authorized("Could not find an id inside the token")
             player = Player.objects.get(id=player_id)
