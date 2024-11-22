@@ -22,3 +22,5 @@ response.html
 /zones/migrations/*
 !/zones/migrations/__init__.py
 
+/regions/migrations/*
+!/regions/migrations/__init__.py
