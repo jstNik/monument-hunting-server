@@ -6,16 +6,15 @@ from zones.models import Zone
 
 # Create your models here.
 class Riddle(models.Model):
+    name = models.CharField(max_length=100)
     body = models.TextField()
     monument = models.ForeignKey(Monument, on_delete=models.SET_NULL, null=True)
-    latitude = models.FloatField(null=False, blank=False)
-    longitude = models.FloatField(null=False, blank=False)
-    zone = models.ForeignKey(Zone, on_delete=models.SET_NULL, null=True)
+    # zone = models.ForeignKey(Zone, on_delete=models.SET_NULL, null=True)
 
     def serialize(self):
         d = model_to_dict(self)
         d["monument"] = self.monument.serialize()
-        d["zone"] = self.zone_id
+        # d["zone"] = self.zone_id
         return d
 
     def __str__(self):

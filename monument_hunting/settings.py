@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     "zones",
     "monuments",
     "riddles",
-    "players_riddles"
+    "players_riddles",
+    "regions"
 ]
 
 AUTH_USER_MODEL = "players.Player"

@@ -6,12 +6,10 @@ from zones.models import Zone
 
 
 class Player(AbstractUser):
-    zone = ForeignKey(Zone, null=True, on_delete=SET_NULL)
 
     def serialize(self):
         d = {
             "id": self.id,
-            "username": self.username,
-            "zone": self.zone_id
+            "username": self.username
         }
         return d

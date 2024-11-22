@@ -3,21 +3,16 @@ from django.db.models import *
 import json
 from django.forms import model_to_dict
 
+from regions.models import Region
+
 
 # Create your models here.
 class Zone(Model):
     name = CharField(max_length=100)
-    coordinates = TextField()
-    color = CharField(
-        max_length=8,
-        validators=[RegexValidator("#[0-9a-fA-F]{6}")]
-    )
-
-    def transform_coords(self):
-        self.coordinates = json.loads(self.coordinates)
+    coordinates = JSONField()
+    region = ForeignKey(Region, null=True, on_delete=SET_NULL)
 
     def serialize(self):
-        self.transform_coords()
         return model_to_dict(self)
 
     def __str__(self):
