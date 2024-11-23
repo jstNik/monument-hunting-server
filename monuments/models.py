@@ -7,6 +7,7 @@ class Monument(Model):
     latitude = FloatField(null=False)
     longitude = FloatField(null=False)
     zone = ForeignKey(Zone, on_delete=SET_NULL, null=True)
+    category = CharField(max_length=50, blank=False, null=False)
 
     def serialize(self):
         d = model_to_dict(self)
