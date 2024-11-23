@@ -1,5 +1,4 @@
 from django.urls import path
-
 from .views import PlayersRiddlesView
 
 app_name = "players_riddles"

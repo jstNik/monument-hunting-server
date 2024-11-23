@@ -1,5 +1,4 @@
 from django.urls import path
-
 from .views import LoginView, SignupView, TokenRefreshView, TokenVerifyView
 
 app_name = "players"

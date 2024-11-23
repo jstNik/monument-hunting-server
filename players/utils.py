@@ -1,10 +1,5 @@
 import jwt
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-
 from monument_hunting.settings import SECRET_KEY
-
 
 def generate_auth_token(refresh):
     decode_access = jwt.decode(str(refresh.access_token), SECRET_KEY, algorithms=["HS256"])

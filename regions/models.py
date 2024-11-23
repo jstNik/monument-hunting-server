@@ -1,6 +1,4 @@
 from django.db import models
-from django.forms import model_to_dict
-
 
 class Region(models.Model):
     name = models.CharField(blank=False, null=False)

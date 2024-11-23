@@ -1,5 +1,4 @@
 import re
-
 import jwt
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
@@ -11,9 +10,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
 from django.core.validators import validate_email
-
 from common.utils import client_not_authorized, extract_api_key
-from monument_hunting.settings import env, SECRET_KEY
+from monument_hunting.settings import env
 from .models import Player
 from .utils import generate_auth_token
 

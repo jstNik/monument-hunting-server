@@ -1,15 +1,9 @@
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from common.utils import invalid_id, extract_api_key, client_not_authorized
 from monument_hunting.settings import env
-from players.models import Player
-from regions.models import Region
-from riddles.models import Riddle
-from zones.models import Zone
 from .models import PlayersRiddles
-from .utils import responseData
+from .utils import response_data
 
 
 class PlayersRiddlesView(APIView):
@@ -23,7 +17,7 @@ class PlayersRiddlesView(APIView):
         player_pk = self.request.user.id
         if player_pk is None:
             return invalid_id()
-        return responseData(player_pk)
+        return response_data(player_pk)
 
     def post(self, request):
         api_key = extract_api_key(request)
@@ -36,4 +30,4 @@ class PlayersRiddlesView(APIView):
             player_id=request.user.id,
             riddle_id = riddle_completed
         )
-        return responseData(request.user.id)
+        return response_data(request.user.id)

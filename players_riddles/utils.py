@@ -8,7 +8,7 @@ from riddles.models import Riddle
 from zones.models import Zone
 
 
-def responseData(player_pk):
+def response_data(player_pk):
     player = Player.objects.get(id=player_pk)
     player_riddles = PlayersRiddles.objects.prefetch_related("riddle").filter(player_id=player_pk)
     zones = Zone.objects.all()

@@ -1,10 +1,7 @@
 from django.db.models import *
 from django.forms import model_to_dict
-
 from zones.models import Zone
 
-
-# Create your models here.
 class Monument(Model):
     name = CharField(max_length=50, null=False, blank=False)
     latitude = FloatField(null=False)
